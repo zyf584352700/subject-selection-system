@@ -1,0 +1,322 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>3-1题库-全部题库</title>
+<link rel="stylesheet" type="text/css" href="theme/1/css/common.css">
+<link rel="stylesheet" type="text/css" href="theme/1/css/style.css">
+<link rel="stylesheet" type="text/css" href="theme/1/css/EditingArea.css">
+<link rel="stylesheet" type="text/css" href="theme/1/css/table.css">
+<link rel="stylesheet" type="text/css" href="theme/1/css/icon.css">
+<link rel="stylesheet" type="text/css" href="theme/1/css/zy.css">
+</head>
+<script type="text/javascript" src="jquery-2.1.4/jquery.min.js"></script>
+<script type="text/javascript">
+  $(function(){
+    $(".baseUI li ul li").css("display","none");
+    $(".baseUI em").parent().bind("click",function(){
+      var li=$(this).siblings().children();
+      li.slideDown();
+      var lis=$(this).parent().siblings().children("ul").children();
+      lis.slideUp();
+     });
+    $(".baseUI li ul li").click(function(){
+      $(this).addClass("current").siblings().removeClass("current");
+    });	
+	$(".baseUI li ul li:eq(0)").click(function(){
+		// $(".right").load("theme/1/loadhtml/显示题目.html");
+		})
+    // $(".baseUI li ul:eq(0) li:eq(0)").trigger('click');
+//显示类型
+    $.getJSON('/exam/manager/getAllSubjectType',function(data){
+        var tr = $('.divtable table tr:hidden').clone().removeAttr("hidden");
+        $('.tablea').append(tr);
+        $('td:first-child').html('类型');
+        $(".chose").html('');
+        data.forEach(function(item,index,arr){
+            if(index == 0){
+                var a = $("<a href='javascript:void(0)' class='active3' id='"+item.id+"'>"+item.realName+"</a>");
+            }else{
+                var a = $("<a href='javascript:void(0)' id='"+item.id+"'>"+item.realName+"</a>");
+            }
+            $('tr:eq(1) .chose').append(a);
+       })
+    });
+//显示难易程度
+    $.getJSON('/exam/manager/getAllSubjectLevel',function(data){
+        var tr = $('.divtable table tr:hidden').clone().removeAttr("hidden");
+        $('.tablea').append(tr);
+        $('tr:eq(2) td:first-child').html('难易程度');
+        $('tr:eq(2) .chose').html('');
+        data.forEach(function(item,index,arr){
+            if(index == 0){
+                var a = $("<a href='javascript:void(0)' class='active3' id='"+item.id+"'>"+item.realName+"</a>");
+            }else{
+                var a = $("<a href='javascript:void(0)' id='"+item.id+"'>"+item.realName+"</a>");
+            }
+            $('tr:eq(2) .chose').append(a);
+        })
+    });  
+//显示方向   
+    $.getJSON('/exam/manager/getAllDepartmentes',function(data){
+        var tr = $('.divtable table tr:hidden').clone().removeAttr("hidden");
+        $('.tablea').append(tr);
+        $('tr:eq(3) td:first-child').html('方向');
+        $('tr:eq(3) .chose').html('');
+        data.forEach(function(item,index,arr){
+            if(index == 0){
+                var a = $("<a href='javascript:void(0)' class='active3' id='"+item.id+"'>"+item.name+"</a>");
+            }else{
+                var a = $("<a href='javascript:void(0)' id='"+item.id+"'>"+item.name+"</a>");
+            }
+            $('tr:eq(3) .chose').append(a);
+        })
+    });
+//显示知识点
+    $.getJSON('/exam/manager/getAllTopics',function(data){
+        var tr = $('.divtable table tr:hidden').clone().removeAttr("hidden");
+        $('.tablea').append(tr);
+        $('tr:eq(4) td:first-child').html('知识点');
+        $('tr:eq(4) .chose').html('');
+        data.forEach(function(item,index,arr){
+            if(index == 0){
+                var a = $("<a href='javascript:void(0)' class='active3' id='"+item.id+"'>"+item.title+"</a>");
+            }else{
+                var a = $("<a href='javascript:void(0)' id='"+item.id+"'>"+item.title+"</a>");
+            }
+            $('tr:eq(4) .chose').append(a);
+        })
+    });
+//事件代理实现点击改变（ 类型,方向．．．．）
+    $('.tablea').on('click','a',function(){
+        //点击先清空题干内容
+        $('.Catalogcontentup span').remove();
+        $('.Catalogcontentup p').remove(); 
+        //点击改变样式
+        $(this).addClass('active3').siblings().removeAttr('class','active3'); 
+        //获取所有点击事件的id值
+        var department_id= $('.tablea tr:eq(1)').find('.active3').attr('id');
+        var subjectLevel_id = $('.tablea tr:eq(2)').find('.active3').attr('id');
+        var subjectType_id = $('.tablea tr:eq(3)').find('.active3').attr('id');
+        var topic_id = $('.tablea tr:eq(4)').find('.active3').attr('id');
+        //进行异步操作
+        $.ajax('/exam/manager/subject',
+            {
+                data:{department_id:department_id,subjectLevel_id:subjectLevel_id,subjectType_id:subjectType_id,topic_id:topic_id},
+                method:'POST',
+                success:function(data){
+                    data.map(function(item,index,arr){
+                        //变量获取题目　item.stem
+                        var subjectType_id_stem = item.stem;
+                        // $('.Catalogcontentup span').remove();
+                        //题目追加到＂题型＂后面　并且加 id 属性（获取到的问题的id） 
+                        $('.Catalogcontentup').append('<span class="span" id="'+item.id+'">'+subjectType_id_stem+'</span>');
+                        //获取到的问题的id
+                        var id = $('.Catalogcontentup').find('.span').attr('id');
+                        $.getJSON('/exam/manager/choice?subject_id='+id,function(data){ 
+                            // $('.Catalogcontentup p').remove();                              
+                            data.forEach(function(item,index){ 
+                                var arr = ['A','B','C','D'];
+                                //判断获取0或1,1添加带样式的答案
+                                if(!item.correct.data.pop()==1){
+                                    $('.Catalogcontentup').append('<p style="display:none"> '+arr[item.use_id-1]+':'+item.content+'</p>');
+                                }else{
+                                    $('.Catalogcontentup').append('<p class="title" style="display:none"> '+arr[item.use_id-1]+':'+item.content+'</p>');
+                                    $('.Catalogcontentup').find('.title').css('color','red');
+                                };
+                                //判断是否有span 给input添加显示
+                                if($('.Catalogcontent span').attr('id')){
+                                    $('.Catalogtitle input').removeAttr('disabled'); 
+                                }else{
+                                    $('.Catalogtitle input').attr('disabled','disabled');
+                                }         
+                            })      
+                        })
+                    })  
+                }
+            }    
+        );  
+    });
+//点击审核通过
+    $('.Catalogcontentdown #true').on('click',function(){
+        var subjectId = $('.Catalogcontent').find('.span').attr('id');
+       //判断是否有span题目 用属性id判断
+        if(subjectId){
+            var checkState = '审核通过';
+            $.get('/exam/manager/updateSubject',{checkState:checkState,id:subjectId},function(data){
+                alert("审核成功");
+            })
+            $('#firstCata').hide();
+            $('#LastCata').show();
+        }else{
+            alert('没有需要审核内容');
+        }  
+    });
+//点击审核不通过
+    $('.Catalogcontentdown #false').on('click',function(){
+        var subjectId = $('.Catalogcontent').find('.span').attr('id');
+        if(subjectId){
+            var checkState = '审核未通过';
+            $.get('/exam/manager/updateSubject',{checkState:checkState,id:subjectId},function(data){
+                alert("审核成功");
+            })
+        }else{
+            alert('没有需要审核内容');
+        }     
+    });
+//点击删除题目
+    $('.Catalogcontentdown #update').on('click',function(){
+        var id = $('.Catalogcontent .Catalogcontentup span').attr('id');
+        if(id){
+            $.ajax('/exam/manager/deleteSubject',
+                {
+                    data:{id:id},
+                    method:'POST',
+                    success:function(data){
+                        $('.Catalogcontentup span').remove();
+                        $('.Catalogcontentup p').remove(); 
+                        alert('删除成功');
+                    }
+                }
+            )
+        }else{
+            alert('没有需要删除的题目');
+        }   
+    });
+//点击显示或隐藏答案
+    $('.Catalogtitle input').on("click",function(){
+        $('.Catalogcontentup').find('p').toggle();       
+    });
+//点击加入试卷
+    $('.Catalogcontentdown .insert').on('click',function(){
+        // alert(1);
+        var question = $('.Catalogcontentup .span').html();
+        var answer1 = $('.Catalogcontentup p:eq(0)').html().slice($('.Catalogcontentup p:eq(0)').html().indexOf(':'));        
+        var answer2 = $('.Catalogcontentup p:eq(1)').html().slice($('.Catalogcontentup p:eq(0)').html().indexOf(':'));
+        var answer3 = $('.Catalogcontentup p:eq(2)').html().slice($('.Catalogcontentup p:eq(0)').html().indexOf(':'));
+        var answer4 = $('.Catalogcontentup p:eq(3)').html().slice($('.Catalogcontentup p:eq(0)').html().indexOf(':'));
+        var answer = answer1.concat(answer2,answer3,answer4);   
+        $.ajax(
+            '/exam/manager/getPaper',
+            {
+                data:{question:question,answer:answer},
+                method:'POST',
+                success:function(data){
+                    location.reload();
+                    // console.log(data);
+                }    
+            }
+        )
+    
+    })
+  }) 
+</script>
+<body>
+<div class="main">
+	<div id="top">
+    	<div class="top">
+        	<div class="tk_logo"></div>
+            <div class="t_sign">
+            	<span>你好，管理员</span><a href="#" class="t_exit">退出</a>
+            </div>
+            <div class="t_icon">
+            	<ul>
+                	<li><a href="javascript:void(0)" class="t1"><span>桌面</span></a></li>
+                    <li><a href="#" class="t2"><span>换肤</span></a></li>
+                    <li><a href="#" class="t3"><span>关于</span></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="cont">
+    	<div class="centent">
+        	<div class="left c_view">
+            	<ul class="baseUI">
+                	<li>  <a href="javascript:void(0)"><em class="base_basicset"></em><span>题库</span></a>
+                        <ul>
+                            <li class="current"><a href="javascript:void(0)">全部题目</a></li>
+                            <li><a href="javascript:void(0)">题目管理</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="javascript:void(0)"><em class="base_userset"></em><span>试卷管理</span></a>
+                        <ul>
+                            <li><a href="javascript:void(0)">试卷列表</a></li>
+                            <li><a href="javascript:void(0)">手工组卷</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="javascript:void(0)">
+                            <em class="base_teachergroup"></em>
+                            <span>考试管理</span>
+                        </a>
+                        <ul>
+                            <li><a href="javascript:void(0)">考试列表</a></li>
+                            <li><a href="javascript:void(0)">考试安排</a></li>
+                        </ul>
+                    </li>     
+                </ul>
+            </div>
+        <div class="right">
+        <div class="editingarea">
+            <div class="c_flex"><span class="c_flexible"></span></div>
+                <div class="c_editview">
+                    <div class="c_condition" style="height:35px;">
+                        <span><select><option>题干</option></select></span>
+                        <span class="pl5 " ><input type="text" style="height:28px;"></span>
+                        <span class="pl15 pr15 btn_gray ">查找</span>
+                        <span class="icon_lead-in"><em class="icon_r">批量导入题目</em></span>
+                        <span class="icon_add"><em class="icon_r">单个添加题目</em></span>
+                    </div>
+                    <div class="divtable">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="tablea">
+                            <tr hidden>
+                                <td align="center">年份</td>
+                                <td align="left">
+                                    <div class="chose" id="chose">
+                                        <a href="#" class="active3">全部</a>
+                                        <a href="#">语文</a>
+                                        <a href="#">数学</a>
+                                        <a href="#">英语</a>
+                                        <a href="#">政治</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="Catalog">
+                        <div class="Catalog_right">
+                            <div class="Catalogtitle">总计<em>15552</em>道题&nbsp;&nbsp;提示：单击体面可显示答案和解析&nbsp;&nbsp;<input type="checkbox" disabled="disabled"/><b>显示答案和解析</b>&nbsp;&nbsp;<a href="javascript:void(0)" class="Thispage">本页全部试题加入试卷</a><div><i>1</i><a href="#" class="pageone">前</a><a href="javascript:void(0)" class="pagetwo">后</a></div>
+                        </div>
+                        <div class="Catalog_rightnei">
+                            <div class="Catalogtitwo">题号：25544&nbsp;&nbsp;题型：还是得&nbsp;&nbsp;难度：订餐&nbsp;&nbsp;上传人：女性司机&nbsp;&nbsp;来源：才能使得&nbsp;&nbsp;上传时间:220255&nbsp;&nbsp;组卷次数：<em>0</em>
+                            </div>
+                                <div class="Catalogcontent">
+                                    <div class="Catalogcontentup">题型:</div>
+                                    <div class="Catalogcontentdown" id="firstCata">
+                                        <a href="javascript:void(0)" id="true">审核通过</a>
+                                        <a href="javascript:void(0)" id="false">审核不通过</a>
+                                        <a href="javascript:void(0)" id="update">删除题目</a>       
+                                    </div>
+                                    <div class="Catalogcontentdown" style="display:none" id="LastCata">
+                                        <a href="javascript:void(0)" class="insert">加入试卷</a>
+                                    </div>
+                                </div>
+                        </div>
+                        <!-- <div class="Catalog_rightnei">
+                            <div class="Catalogtitwo">题号：25544&nbsp;&nbsp;题型：还是得&nbsp;&nbsp;难度：订餐&nbsp;&nbsp;上传人：女性司机&nbsp;&nbsp;来源：才能使得&nbsp;&nbsp;上传时间:220255&nbsp;&nbsp;组卷次数：<em>0</em>
+                        </div>
+                        <div class="Catalogcontent">
+                            <div class="Catalogcontentup">题型:</div>
+                            <div class="Catalogcontentdown"><a href="#">加入试卷</a></div>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+    </div>
+</div>      
+<div id="foot"><a href="#">上海师悦信息科技有限公司</a></div>
+</div>
+</body>
+</html>
