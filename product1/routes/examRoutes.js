@@ -79,4 +79,33 @@ router.post('/getPaper',(req,resp)=>{
     resp.send(error);
   })
 });
+router.get('/insert',(req,resp)=>{
+  var analysis = req.query.analysis;
+  var answer = req.query.answer;
+  var checkState =req.query.checkState;
+  var stem = req.query.stem;
+  var department_id = req.query.department;
+  var subjectLevel_id = req.query.subjectLevel;
+  var subjectType_id = req.query.subjectType;
+  var topic_id = req.query.topic
+  examDB.insert(analysis,answer,checkState,stem,department_id,subjectLevel_id,subjectType_id,topic_id).then((data)=>{
+    resp.send(data);
+  }).catch((error)=>{
+    resp.send(error);
+  });
+})
+ router.get('/insertinto',(req,resp)=>{
+    console.log(1);
+  //  console.log(req.query);
+      var correct = req.query.correct ; 
+      var content = req.query.content ; 
+      var subject_id = req.query.subject_id ; 
+      var use_id = req.query.use_id ; 
+    examDB.insertinto(content,correct,subject_id,use_id).then((data)=>{
+      console.log(data);
+      resp.send(data);
+    }).catch((error)=>{
+      resp.send(error);
+    })
+  })
 module.exports = router;

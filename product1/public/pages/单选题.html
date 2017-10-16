@@ -1,0 +1,307 @@
+<div class="editingarea">
+  <div class="c_flex"><span class="c_flexible"></span></div>
+  <div class="Topictitle">添加题目<a href="#" id="load">返回</a></div></div>
+  <div class="choose">
+    <div class="chooseContent">
+        <span>类型:</span>
+        <select name="" id="select0">
+          <option value="" class="title">单选题</option>      
+          <option value="">复选题</option>      
+          <option value="">简答题</option> 
+        </select>
+        <span>难易程度:</span>
+        <select name="" id="select1">
+          <option value="" class="title">简单</option>      
+          <option value="">中等</option>      
+          <option value="">难</option> 
+        </select>
+        <span>方向:</span>
+        <select name="" id="select2">
+          <option value="" class="title">WebUI</option>      
+          <option value="">JavaEE</option>      
+          <option value="">大数据</option>  
+          <option value="">Android</option>  
+          <option value="">PHP</option>  
+          <option value="">IOS</option>  
+        </select>
+        <span>知识点:</span>
+        <select name="" id="select3">
+          <option value="" class="title">HTML</option>      
+          <option value="">JavaScript</option>      
+          <option value="">CSS</option>  
+          <option value="">jQuery</option>  
+          <option value="">Bootstrap</option>  
+          <option value="">CoreJava</option> 
+          <option value="">XML</option> 
+          <option value="">Servlet/JSP</option> 
+        </select>  
+    </div> 
+  </div>
+  <div class="c_editview">
+    <div class="Problem">
+      <div class="Attributetit">题目题干</div>
+      <div class="Problemcontent">
+            <textarea name="" id="rubric"></textarea>         
+             <!-- 添加题目 -->
+      </div>
+    </div>
+    <div class="Answeroptions">
+      <div class="Attributetit">答案选项<em>(通过勾选每个选项下面的框难吃时间点咳嗽打开)</em>
+      </div>
+      <div class="c_condition">
+        <span class="icon_add">
+          <em class="icon_r" id="voidAddItem" style="float: left">添加选项</em>
+        </span>
+      </div>
+      <div class="Answercontent" style="display:none">
+        <div class="Answerpart">
+          <div class="Answerpart_left">
+             <p>A</p><span><input type="radio" name="radio" id="a1"/></span>
+          </div>
+          <div class="Answerpart_right">
+            <textarea name="" id="answer1"></textarea>
+            <!--添加答案ａ  -->
+          </div>
+          <div class="clear"></div>
+        </div>
+      <div class="Answerpart">
+        <div class="Answerpart_left">
+          <p>B</p><span><input type="radio"  name="radio" id="a2"/></span>
+        </div>
+        <div class="Answerpart_right">
+            <textarea name="" id="answer2"></textarea>
+          <!--添加答案ｂ  -->
+        </div>
+        <div class="clear"></div>
+      </div>
+      <div class="Answerpart">
+        <div class="Answerpart_left">
+          <p>C</p><span><input type="radio" name="radio" id="a3"/></span>
+        </div>
+        <div class="Answerpart_right">
+            <textarea name="" id="answer3"></textarea>
+          <!-- 添加答案ｃ -->
+        </div>
+        <div class="clear"></div>
+      </div>
+        <div class="Answerpart">
+          <div class="Answerpart_left">
+            <p>D</p><span><input type="radio" name="radio" id="a4"/></span>
+          </div>
+          <div class="Answerpart_right">
+            <textarea name="" id="answer4"></textarea>         
+              <!-- 添加答案ｄ -->
+          </div>
+          <div class="clear"></div>
+        </div>
+        <div class="clear"></div>
+      </div>
+    </div>
+    <div class="Problem">
+      <div class="Attributetit">答案解析</div>
+      <div class="Problemcontent">
+        <textarea name="" id="analysis"> </textarea>                 
+      </div>
+    </div>
+      <div class="Problem prome" style="display:none">
+        <div class="fistproblm"><span>1.</span><a href="#"></a></div>
+        <div class="Problemcontent">
+          <textarea name="" id=""> </textarea>            
+        </div>
+      </div>
+      <div class="Problem prome" style="display:none">
+        <div class="fistproblm"><span>1.</span><a href="#"></a></div>
+        <div class="Problemcontent">
+          <textarea name="" id=""> </textarea>          
+        </div>
+      </div>
+      <div class="Problem prome" style="display:none">
+        <div class="fistproblm"><span>1.</span><a href="#"></a></div>
+        <div class="Problemcontent">
+          <textarea name="" id=""> </textarea>                   
+        </div>
+      </div>
+      <div class="btn_left">
+          <span class="btnL"><em class="btnR keep">保存并继续</em></span><span class="btnL"><em class="btnR close">保存并关闭</em></span>
+      </div>
+    </div>
+</div>
+<script>
+  $(function(){  
+    $('input[type=radio]').on('click',function(){
+      $('.Answerpart_left input[type=radio]').attr('class','0');
+      $(this).attr('class','1');
+    });  
+    //封装的代码 
+    function handler1(url,realName,select){
+      $.getJSON(url,function(data){
+        data.forEach(function(item) {
+          if(item.realName==realName){
+            select.find('.title').val(item.id).siblings().val('');
+          }
+        }, this);
+      });
+    };
+    function handler2(url,realName){
+      $.getJSON(url,function(data){
+        data.forEach(function(item) {
+          if(item.name==realName){
+            $('#select2').find('.title').val(item.id).siblings().val('');
+          }
+        }, this);
+      });
+    };
+    function handler3(url,realName){
+      $.getJSON(url,function(data){
+        data.forEach(function(item) {
+          if(item.title==realName){
+            $('#select3').find('.title').val(item.id).siblings().val('');
+          }
+        }, this);
+      });
+    }
+    function addOrStop(button){
+      //获取四个外键ｖａｌ值
+      var subjectType = $('#select0').find('.title').val();
+      var subjectLevel = $('#select1').find('.title').val();
+      var department = $('#select2').find('.title').val();
+      var topic = $('#select3').find('.title').val();
+      //获取题目
+      var stem = $('#rubric').val();
+      //获取审核
+      var checkState ="未审核";
+      //获取答案
+      var answer1 = $('#answer1').val();
+      var answer2 = $('#answer2').val();
+      var answer3 = $('#answer3').val();
+      var answer4 = $('#answer4').val();
+      var answer = answer1+','+answer2+','+answer3+','+answer4;
+      //获取解析
+      var analysis = $('#analysis').val();
+      $.ajax(
+        '/exam/manager/insert',
+        {
+          data:{
+            analysis:analysis,
+            answer:answer,
+            checkState:checkState,
+            stem:stem,
+            department:department,
+            subjectLevel:subjectLevel,
+            subjectType:subjectType,
+            topic:topic
+          },   
+          success:function(data){
+            var subject_id = data.insertId; 
+            var correctArr = [];
+            var a1 = +$('#a1').attr('class');   
+            var a2 = +$('#a2').attr('class');   
+            var a3 = +$('#a3').attr('class');   
+            var a4 = +$('#a4').attr('class'); 
+            correctArr.push(a1,a2,a3,a4,answer1,answer2,answer3,answer4);
+            console.log(correctArr);
+            for(var i=0;i<4;i++){
+              var correct = correctArr[i];
+              var content = correctArr[i+4];
+              console.log(content);
+              var use_id = [i+1];
+              $.ajax('/exam/manager/insertinto',{
+                data:{
+                  correct:correct,
+                  content:content,
+                  subject_id:subject_id,
+                  use_id:use_id
+                },
+                success:function(data){
+
+                }
+              })
+            };   
+            if(button=='保存并继续'){ 
+              $(".right").load("./pages/单选题.html");
+            }else if(button = '保存并关闭'){
+              $(".baseUI li ul:eq(0) li:eq(0)").trigger('click');              
+            }   
+          }
+        } 
+      )
+    }
+    //点击下拉框
+    $('select option').on('click',function(){
+      //设置了val值
+      $(this).attr('class','title').siblings().removeAttr('class','title');
+      var subjectType_realName = $('#select0').find('.title').html();      
+      var subjectLevel_realName = $('#select1').find('.title').html();
+      var department_realName = $('#select2').find('.title').html();
+      var topic_realName = $('#select3').find('.title').html();
+      handler1('/exam/manager/getAllSubjectType',subjectType_realName,$('#select0'));
+      handler1('/exam/manager/getAllSubjectLevel',subjectLevel_realName,$('#select1'));
+      handler2('/exam/manager/getAllDepartmentes',department_realName);
+      handler3('/exam/manager/getAllTopics',topic_realName);
+      if($('#select0').find('.title').html()=='简答题'){
+        $('.Answeroptions').css('display',"none");
+        $('.c_condition').css('display',"none");
+        $('.prome').css('display','block');
+      }else if($('#select0').find('.title').html()=='单选题' || $('#select0').find('.title').html()=='复选题'){
+        $('.Answeroptions').css('display',"block");
+        $('.c_condition').css('display',"block");
+        $('.prome').css('display','none');  
+      }
+    }); 
+    //点击保存并继续
+    $('.btn_left .keep').on('click',function(){
+      var button = $(this).html();
+      addOrStop(button);
+    });
+    //点击保存并退出
+    $('.btn_left .close').on('click',function(){
+      var button = $(this).html();
+      addOrStop(button);
+    });
+    //点击添加选项
+    $('#voidAddItem').on('click',function(){
+      $('.Answercontent').css('display','block');
+    });
+    //点击返回
+    $('#load').on('click',function(){
+              $(".baseUI li ul:eq(0) li:eq(0)").trigger('click');                    
+    })
+  })
+</script>
+<style>
+  .Answerpart .Answerpart_right textarea{
+    width: 432px;
+    height: 85px;
+  }
+  .Problemcontent textarea{
+     width:1630px; 
+    height: 60px;
+  }
+  .choose{
+    border-bottom: 1px solid #ccc;
+  }
+  .choose .chooseContent{
+    font-size: 15px;
+    width: 800px;
+    margin:0 auto;
+    display: flex;
+    justify-content: space-around;
+    overflow: hidden;
+  }
+  .choose .chooseContent span{
+    display: block;
+    height: 40px;
+    line-height: 40px;
+  }
+  #load{
+    display: inline-block;
+    margin: 0 8px;
+    border:1px solid black;
+    line-height: 24px;
+    height: 24px;
+    position: relative;
+    top: 5px;
+    left: 600px;
+  }
+  
+</style>

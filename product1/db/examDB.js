@@ -43,6 +43,16 @@ module.exports = {
   getPaper(question,answer){
     var sql = "insert into paper values(null,'"+question+"','"+answer+"')";
     return pool.execute(sql);
-  }
-  
+  },
+  //添加题目
+  insert(analysis,answer,checkState,stem,department_id,subjectLevel_id,subjectType_id,topic_id){
+    var sql = "insert into tbl_exam_subject values(null,'"+analysis+"','"+answer+"','"+checkState+"','"+stem+"',null,"+department_id+","+subjectLevel_id+","+subjectType_id+","+topic_id+",null)";
+    return pool.execute(sql);
+  //添加答案
+  },
+  insertinto(content,correct,subject_id,use_id){
+    var sql = "insert into tbl_exam_choice values(null,'"+content+"',"+correct+","+subject_id+","+use_id+")";
+    // var sql = "insert into tbl_exam_choice values(null,'"+content+"',"+correct+","+subject_id+",1)";
+    return pool.execute(sql);
+  } 
 }
